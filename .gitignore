@@ -1,18 +1,15 @@
-*.gem
-*.rbc
-.bundle
-.config
-coverage
-InstalledFiles
-lib/bundler/man
-pkg
-rdoc
-spec/reports
-test/tmp
-test/version_tmp
-tmp
+*~
 
-# YARD artifacts
-.yardoc
-_yardoc
-doc/
+# ignore packer artifacts
+packer_cache
+# ignore generated .box files
+*.box
+
+# ignore variables file for packer
+variables.json
+
+# ignore X.509 keys
+*.pem
+
+# virtual box intermediates
+output-virtualbox/

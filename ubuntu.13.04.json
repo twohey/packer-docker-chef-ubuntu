@@ -1,0 +1,130 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_account_id": "",
+    "aws_region": "us-west-1",
+    "aws_s3_bucket": "",
+    "aws_secret_key": "",
+    "aws_x509_cert_path": "",
+    "aws_x509_key_path": "",
+    "image_name_prefix": "ubuntu.13.04"
+  },
+
+  "builders": [
+    {
+      "type": "virtualbox",
+      "iso_url": "http://releases.ubuntu.com/13.04/ubuntu-13.04-server-amd64.iso",
+      "iso_checksum": "edf1194d7bc99b64dca177deecade9e13f0a8c3339c9fd8832471a2e7ed1dda5",
+      "iso_checksum_type": "sha256",
+      "guest_os_type": "Ubuntu_64",
+      "boot_wait": "5s",
+      "boot_command": [
+        "<esc><esc><enter><wait>",
+        "/install/vmlinuz noapic ",
+        "preseed/url=http://{{.HTTPIP}}:{{.HTTPPort}}/preseed.cfg ",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        "hostname={{.Name}} ",
+        "fb=false debconf/frontend=noninteractive ",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+        "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
+        "initrd=/install/initrd.gz -- <enter>"
+      ],
+      "http_directory": "http",
+      "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+      "ssh_wait_timeout": "10000s",
+      "ssh_port": 22,
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant"
+    },
+
+    {
+      "type": "amazon-instance",
+      "ami_description": "Ubuntu 13.04 instance created at {{isotime}}",
+      "ami_name": "{{user `image_name_prefix`}}-{{timestamp}}",
+      "s3_bucket": "{{user `aws_s3_bucket`}}",
+      "region": "{{user `aws_region`}}",
+      "instance_type": "m1.small",
+      "source_ami": "ami-46370303",
+      "ssh_username": "ubuntu",
+      "x509_cert_path": "{{user `aws_x509_cert_path`}}",
+      "x509_key_path": "{{user `aws_x509_key_path`}}",
+      "account_id": "{{user `aws_account_id`}}",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}"
+    }
+  ],
+  
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "files/docker.gpg",
+      "destination": "/tmp/docker.gpg"
+    },
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/base.sh",
+        "scripts/chef.sh"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E '{{ .Path }}'",
+      "override": {
+        "virtualbox": {
+          "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'"
+        }
+      }
+    },
+    {
+      "type": "shell",
+      "scripts": [ "scripts/vagrant.sh" ],
+      "only": ["virtualbox"],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'"
+    },
+    {
+      "type": "shell",
+      "only": [ "amazon-instance"],
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E '{{ .Path }}'",
+      "environment_vars": [ "AWS_REGION={{user `aws_region`}}" ],
+      "scripts": [ "scripts/builder/amazon.sh" ]
+    },
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/docker-kernel.sh",
+        "scripts/docker.sh"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E '{{ .Path }}'",
+      "override": {
+        "virtualbox": {
+          "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'"
+        }
+      }
+    },
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/builder/virtualbox.sh"
+      ],
+      "only": ["virtualbox"],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'"
+    },
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/vm_cleanup.sh"
+      ],
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E '{{ .Path }}'",
+      "override": {
+        "virtualbox": {
+          "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'"
+        }
+      }      
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "only": ["virtualbox"],
+      "output": "{{user `image_name_prefix`}}-{{timestamp}}.box"
+    }
+  ]
+}

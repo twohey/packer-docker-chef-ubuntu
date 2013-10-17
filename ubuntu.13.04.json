@@ -118,6 +118,14 @@
           "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'"
         }
       }      
+    },
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/reduce_disk_space"
+      ],
+      "only": ["virtualbox"],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'"
     }
   ],
   "post-processors": [

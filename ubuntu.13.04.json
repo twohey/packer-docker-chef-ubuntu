@@ -44,7 +44,7 @@
       "s3_bucket": "{{user `aws_s3_bucket`}}",
       "region": "{{user `aws_region`}}",
       "instance_type": "m1.small",
-      "source_ami": "ami-46370303",
+      "source_ami": "ami-1491b851",
       "ssh_username": "ubuntu",
       "x509_cert_path": "{{user `aws_x509_cert_path`}}",
       "x509_key_path": "{{user `aws_x509_key_path`}}",

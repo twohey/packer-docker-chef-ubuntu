@@ -122,7 +122,7 @@
     {
       "type": "shell",
       "scripts": [
-        "scripts/reduce_disk_space"
+        "scripts/reduce_disk_space.sh"
       ],
       "only": ["virtualbox"],
       "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S bash '{{.Path}}'"

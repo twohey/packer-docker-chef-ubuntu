@@ -1,17 +1,21 @@
 #!/bin/bash -x
 
+if [ -z ${AWS_DEFAULT_REGION} ]; then
+  AWS_DEFAULT_REGION=us-west-1
+  echo "Forcing AWS_DEFAULT_REGION to ${AWS_DEFAULT_REGION}"
+fi
 echo "AWS_REGION is ${AWS_REGION}"
-echo "Adding multiverse to sources.list.d"
 
+echo "Adding multiverse to sources.list.d as ${LIST}"
 LIST=/etc/apt/sources.list.d/amazon.list
-
-echo deb http://${AWS_REGION}.ec2.archive.ubuntu.com/ubuntu/ raring multiverse > ${LIST}
-echo deb-src http://${AWS_REGION}.ec2.archive.ubuntu.com/ubuntu/ raring multiverse >> ${LIST}
-echo deb http://${AWS_REGION}.ec2.archive.ubuntu.com/ubuntu/ raring-updates multiverse >> ${LIST}
-echo deb-src http://${AWS_REGION}.ec2.archive.ubuntu.com/ubuntu/ raring-updates multiverse >> ${LIST}
-echo deb http://security.ubuntu.com/ubuntu raring-security multiverse >> ${LIST}
-echo deb-src http://security.ubuntu.com/ubuntu raring-security multiverse >> ${LIST}
-
+cat <<EOF > ${LIST}
+deb http://${AWS_DEFAULT_REGION}.ec2.archive.ubuntu.com/ubuntu/ raring multiverse
+deb-src http://${AWS_DEFAULT_REGION}.ec2.archive.ubuntu.com/ubuntu/ raring multiverse
+deb http://${AWS_DEFAULT_REGION}.ec2.archive.ubuntu.com/ubuntu/ raring-updates multiverse
+deb-src http://${AWS_DEFAULT_REGION}.ec2.archive.ubuntu.com/ubuntu/ raring-updates multiverse
+deb http://security.ubuntu.com/ubuntu raring-security multiverse
+deb-src http://security.ubuntu.com/ubuntu raring-security multiverse
+EOF
 
 # Update your sources
 echo "Updating sources"

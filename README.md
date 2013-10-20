@@ -18,10 +18,10 @@ is [tracked] [2] and will hopefully be fixed soon.
 There are a number of ways you can shoot yourself in the foot while
 making images and this repository avoids all the ones I know about.
 Since there is no good way to put comments in a json file, I feel
-compelled to point out the inclusion of the inclusion of
-`shutdown_command` for the vagrant builder. Packer does not
-[currently] [3] warn if you do not have a command there, but without it
-you will not be able to make an image.
+compelled to point out the inclusion of the `shutdown_command`
+for the vagrant builder. Packer does not [currently] [3] warn if
+you do not have a command there, but without it you will not be able
+to make an image.
 
 There is a known [bug] [4] with vagrant post-processors for instance
 images which prevents them from being run, which is why they are
@@ -29,6 +29,14 @@ disabled.
 
 Since image names need to be unique, I use a timestamp suffix. You may
 want to use something more meaningful.
+
+The traditional EC2 command line tools have a number of [very] [9]
+[sharp] [10] edges around building instance store images, the most
+notable of which is that by default they remove all .pem and .gpg files
+from the image being built, which effectively causes the images to be
+unable to authenticate a secure SSL connection. This is the reason for
+the custom `bundle_vol_command` which uses `--no-filter` and excludes
+`/tmp`, where keys are uploaded, directly.
 
 As you experiment in building images, you will probably find it helpful
 to set the `PACKER_CACHE` environment variable so that you can avoid
@@ -92,3 +100,5 @@ certainly want to lock the system down. There are a number of [good] [5]
   [6]: http://www.debian.org/doc/manuals/securing-debian-howto/ "Securing Debian Manual"
   [7]: http://spenserj.com/blog/2013/07/15/securing-a-linux-server/ "Securing a Linux Server"
   [8]: https://news.ycombinator.com/item?id=6384603 "Hacker News on 'Securing a Linux Server'"
+  [9]: https://forums.aws.amazon.com/message.jspa?messageID=291999# "ec2-bundle-vol problem discussion"
+  [10]: https://github.com/mitchellh/packer/pull/256 "Packer Pull 256"

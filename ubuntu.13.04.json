@@ -46,7 +46,8 @@
       "instance_type": "m1.small",
       "source_ami": "ami-1491b851",
       "ssh_username": "ubuntu",
-      "bundle_vol_command": "sudo -n ec2-bundle-vol -k {{.KeyPath}} -u {{.AccountId}} -c {{.CertPath}} -r {{.Architecture}} -e {{.PrivatePath}} -d {{.Destination}} -p {{.Prefix}} --no-filter --exclude /tmp --batch",
+      "bundle_vol_command": "sudo -n ec2-bundle-vol -k {{.KeyPath}} -u {{.AccountId}} -c {{.CertPath}} -r {{.Architecture}} -e {{.PrivatePath}} -d {{.Destination}} -p {{.Prefix}} --no-filter --exclude /tmp/certs --batch",
+      "x509_upload_path": "/tmp/certs",
       "x509_cert_path": "{{user `aws_x509_cert_path`}}",
       "x509_key_path": "{{user `aws_x509_key_path`}}",
       "account_id": "{{user `aws_account_id`}}",
@@ -60,6 +61,12 @@
       "type": "file",
       "source": "files/docker.gpg",
       "destination": "/tmp/docker.gpg"
+    },
+    {
+      "type": "shell",
+      "only": ["amazon-instance" ],
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E '{{ .Path }}'",
+      "inline": [ "mkdir /tmp/certs && chmod a+rwx /tmp/certs" ]
     },
     {
       "type": "shell",

@@ -12,26 +12,26 @@ Details
 
 In order to build instance store backed images you will need the your
 AWS credentials. Also, because packer is still using the old AWS command
-line utilities you will need to [generate and use] [1] X.509 keys. This
-is [tracked] [2] and will hopefully be fixed soon.
+line utilities you will need to [generate and use][1] X.509 keys. This
+is [tracked][2] and will hopefully be fixed soon.
 
 There are a number of ways you can shoot yourself in the foot while
 making images and this repository avoids all the ones I know about.
 Since there is no good way to put comments in a json file, I feel
 compelled to point out the inclusion of the `shutdown_command`
-for the vagrant builder. Packer does not [currently] [3] warn if
+for the vagrant builder. Packer does not [currently][3] warn if
 you do not have a command there, but without it you will not be able
 to make an image.
 
-There is a known [bug] [4] with vagrant post-processors for instance
+There is a known [bug][4] with vagrant post-processors for instance
 images which prevents them from being run, which is why they are
 disabled.
 
 Since image names need to be unique, I use a timestamp suffix. You may
 want to use something more meaningful.
 
-The traditional EC2 command line tools have a number of [very] [9]
-[sharp] [10] edges around building instance store images, the most
+The traditional EC2 command line tools have a number of [very][9]
+[sharp][10] edges around building instance store images, the most
 notable of which is that by default they remove all .pem and .gpg files
 from the image being built, which effectively causes the images to be
 unable to authenticate a secure SSL connection. This is the reason for
@@ -88,8 +88,8 @@ Caveats
 
 The image created here has not been security hardened or audited in any
 way. If you are using this for anything other than an example you almost
-certainly want to lock the system down. There are a number of [good] [5] 
-[starting] [6] [points] [7] [for] [8] securing a sever.
+certainly want to lock the system down. There are a number of [good][5] 
+[starting][6] [points][7] [for][8] securing a sever.
 
 
   [1]: http://docs.aws.amazon.com/IAM/latest/UserGuide/Using_UploadCertificate.html
